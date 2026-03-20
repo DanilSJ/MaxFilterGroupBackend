@@ -36,5 +36,16 @@ class CreateGroupSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UpdateGroupSchema(CreateGroupSchema):
+class UpdateGroupSchemaPartial(BaseModel):
+    name: str = None
+    group_id: int = None
+    bad_words: bool = None
+    repost: bool = None
+    stop_word: bool = None
+    link: bool = None
+    message_delete: bool = None
+    bad_words_text: str = None
+    stop_word_text: str = None
+    pinned: bool = None
+
     model_config = ConfigDict(from_attributes=True)
