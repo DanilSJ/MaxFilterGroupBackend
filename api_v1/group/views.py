@@ -16,4 +16,20 @@ async def create_group(
 ):
     await get_current_user(token)
 
-    return await crud.create_group(session=session, user_in=group_in)
+    return await crud.create_group(session=session, group_in=group_in)
+
+
+@router.patch("/{group_id}", response_model=schemas.GroupSchema)
+async def update_group(
+        group_id: int,
+        group_update: schemas.UpdateGroupSchemaPartial,
+        token: str = Depends(get_token),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    await get_current_user(token)
+
+    return await crud.update_group(
+        session=session,
+        group_id=group_id,
+        group_update=group_update
+    )
