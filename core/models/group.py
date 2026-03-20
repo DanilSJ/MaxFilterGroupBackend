@@ -1,5 +1,5 @@
-from sqlalchemy import String, Boolean, BigInteger, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, Boolean, BigInteger, Text, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 
@@ -18,3 +18,14 @@ class Group(Base):
     stop_word_text: Mapped[str] = mapped_column(Text, nullable=True)
 
     pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    grid_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("grids.id", ondelete="CASCADE"),
+        nullable=True
+    )
+
+    grid: Mapped["Grid"] = relationship(
+        "Grid",
+        back_populates="groups"
+    )
