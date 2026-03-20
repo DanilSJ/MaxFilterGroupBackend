@@ -30,7 +30,7 @@ async def login_user(
     data: schemas.LoginSchema,
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    user = await crud.login_user(session, data.name, data.password)
+    user = await crud.login_user(session, data.email, data.password)
 
     if not user:
         raise HTTPException(
