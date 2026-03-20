@@ -1,4 +1,6 @@
+from typing import List
 from pydantic import BaseModel, ConfigDict
+from api_v1.group.schemas import GroupSchema
 
 
 class GridSchema(BaseModel):
@@ -14,6 +16,7 @@ class GridSchema(BaseModel):
     stop_word_text: str = None
 
     pinned: bool = None
+    groups: List[GroupSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,11 +28,10 @@ class CreateGridSchema(BaseModel):
     stop_word: bool
     link: bool
     message_delete: bool
-
     bad_words_text: str
     stop_word_text: str
-
     pinned: bool
+    group_ids: List[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -44,5 +46,6 @@ class UpdateGridSchemaPartial(BaseModel):
     bad_words_text: str = None
     stop_word_text: str = None
     pinned: bool = None
+    group_ids: List[int] = None
 
     model_config = ConfigDict(from_attributes=True)
