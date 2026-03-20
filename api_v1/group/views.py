@@ -19,7 +19,7 @@ async def create_group(
     return await crud.create_group(session=session, group_in=group_in)
 
 
-@router.patch("/{group_id}", response_model=schemas.GroupSchema)
+@router.patch("/{group_id}/", response_model=schemas.GroupSchema)
 async def update_group(
         group_id: int,
         group_update: schemas.UpdateGroupSchemaPartial,

@@ -19,7 +19,7 @@ async def create_grid(
     return await crud.create_grid(session=session, grid_in=grid_in)
 
 
-@router.patch("/{group_id}", response_model=schemas.GridSchema)
+@router.patch("/{group_id}/", response_model=schemas.GridSchema)
 async def update_grid(
         group_id: int,
         group_update: schemas.UpdateGridSchemaPartial,
