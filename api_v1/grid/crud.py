@@ -66,9 +66,8 @@ async def update_grid(
         grid_id: int,
         grid_update: UpdateGridSchemaPartial
 ):
-    # Явно указываем загрузку groups с помощью selectinload или joinedload
     stmt = select(Grid).where(Grid.id == grid_id).options(
-        selectinload(Grid.groups)  # или joinedload(Grid.groups)
+        selectinload(Grid.groups)
     )
     result: Result = await session.execute(stmt)
     grid = result.scalars().first()
@@ -77,8 +76,35 @@ async def update_grid(
         raise HTTPException(status_code=404, detail="Grid not found")
 
     update_data = grid_update.model_dump(exclude_unset=True, exclude={'group_ids'})
+
+    # Поля, которые нужно синхронизировать с группами
+    sync_fields = {
+        'bad_words', 'repost', 'stop_word', 'link',
+        'message_delete', 'message_delete_text',
+        'bad_words_text', 'stop_word_text'
+    }
+
+    # Сохраняем старые значения для отслеживания изменений
+    old_values = {}
+    fields_to_sync = []
+
     for field, value in update_data.items():
+        old_value = getattr(grid, field)
         setattr(grid, field, value)
+
+        # Если поле из списка синхронизируемых и значение изменилось
+        if field in sync_fields and old_value != value:
+            fields_to_sync.append(field)
+            old_values[field] = old_value
+
+    # Обновляем группы, если есть изменения в синхронизируемых полях
+    if fields_to_sync and grid.groups:
+        for group in grid.groups:
+            for field in fields_to_sync:
+                setattr(group, field, getattr(grid, field))
+
+        # Добавляем группы в сессию для обновления
+        session.add_all(grid.groups)
 
     if grid_update.group_ids is not None:
         stmt = select(Group).where(Group.id.in_(grid_update.group_ids))
@@ -93,7 +119,6 @@ async def update_grid(
                 detail=f"Groups not found with ids: {missing_ids}"
             )
 
-        # Проверяем, что группы не привязаны к другим гридам
         for group in new_groups:
             if group.grid_id is not None and group.grid_id != grid_id:
                 raise HTTPException(
@@ -102,18 +127,22 @@ async def update_grid(
                 )
 
         # Отвязываем старые группы
-        for old_group in grid.groups:  # теперь groups уже загружены
+        for old_group in grid.groups:
             old_group.grid = None
 
         # Привязываем новые группы
         for new_group in new_groups:
             new_group.grid = grid
 
+            # Синхронизируем поля с новыми группами
+            for field in sync_fields:
+                setattr(new_group, field, getattr(grid, field))
+
+        session.add_all(new_groups)
         await session.flush()
 
     await session.commit()
 
-    # После коммита нужно снова обновить grid с groups
     await session.refresh(grid, attribute_names=['groups'])
 
     return grid
