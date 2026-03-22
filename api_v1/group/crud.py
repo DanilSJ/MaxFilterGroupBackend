@@ -5,9 +5,12 @@ from sqlalchemy import select
 from core.models import Group
 from .schemas import *
 
+async def get_group(session: AsyncSession, group_id) -> Group | None:
+    return await session.get(Group, group_id)
+
 
 async def create_group(session: AsyncSession, group_in: CreateGroupSchema) -> Group:
-    stmt = select(Group).where(Group.name == group_in.name)
+    stmt = select(Group).where(Group.group_id == group_in.group_id)
     result: Result = await session.execute(stmt)
 
     if result.scalars().first():
