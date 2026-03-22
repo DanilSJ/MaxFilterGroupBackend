@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper
 from . import schemas
@@ -7,15 +7,22 @@ from api_v1.auth.views import get_token, get_current_user
 
 router = APIRouter()
 
+@router.get("/{group_id}/", response_model=schemas.GroupSchema)
+async def get_user_by_id(
+    group_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    result = await crud.get_group(session, group_id)
+    if not result:
+        raise HTTPException(status_code=404)
+
+    return result
 
 @router.post("/", response_model=schemas.GroupSchema)
 async def create_group(
     group_in: schemas.CreateGroupSchema,
-    token: str = Depends(get_token),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    await get_current_user(token)
-
     return await crud.create_group(session=session, group_in=group_in)
 
 
@@ -23,10 +30,8 @@ async def create_group(
 async def update_group(
         group_id: int,
         group_update: schemas.UpdateGroupSchemaPartial,
-        token: str = Depends(get_token),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    await get_current_user(token)
 
     return await crud.update_group(
         session=session,
