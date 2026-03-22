@@ -2,9 +2,23 @@ from fastapi import HTTPException
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
 from core.models import Grid, Group
 from .schemas import *
 
+
+async def get_grids(session: AsyncSession) -> List[Grid]:
+    stmt = select(Grid).order_by(Grid.id).options(selectinload(Grid.groups))
+    result = await session.execute(stmt)
+    grids = result.scalars().all()
+    return list(grids)
+
+async def get_grid_group(session: AsyncSession, grid_id: int) -> Grid:
+    stmt = select(Grid).where(Grid.id == grid_id).order_by(Grid.id).options(selectinload(Grid.groups))
+    result = await session.execute(stmt)
+    grids = result.scalars().first()
+    return grids
 
 async def create_grid(session: AsyncSession, grid_in: CreateGridSchema) -> Grid:
     stmt = select(Grid).where(Grid.name == grid_in.name)
@@ -52,7 +66,10 @@ async def update_grid(
         grid_id: int,
         grid_update: UpdateGridSchemaPartial
 ):
-    stmt = select(Grid).where(Grid.id == grid_id)
+    # Явно указываем загрузку groups с помощью selectinload или joinedload
+    stmt = select(Grid).where(Grid.id == grid_id).options(
+        selectinload(Grid.groups)  # или joinedload(Grid.groups)
+    )
     result: Result = await session.execute(stmt)
     grid = result.scalars().first()
 
@@ -76,6 +93,7 @@ async def update_grid(
                 detail=f"Groups not found with ids: {missing_ids}"
             )
 
+        # Проверяем, что группы не привязаны к другим гридам
         for group in new_groups:
             if group.grid_id is not None and group.grid_id != grid_id:
                 raise HTTPException(
@@ -83,15 +101,19 @@ async def update_grid(
                     detail=f"Group {group.id} is already assigned to another grid"
                 )
 
-        for old_group in grid.groups:
+        # Отвязываем старые группы
+        for old_group in grid.groups:  # теперь groups уже загружены
             old_group.grid = None
 
+        # Привязываем новые группы
         for new_group in new_groups:
             new_group.grid = grid
 
         await session.flush()
 
     await session.commit()
+
+    # После коммита нужно снова обновить grid с groups
     await session.refresh(grid, attribute_names=['groups'])
 
     return grid
