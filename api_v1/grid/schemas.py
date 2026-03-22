@@ -11,6 +11,7 @@ class GridSchema(BaseModel):
     stop_word: bool = None
     link: bool = None
     message_delete: bool = None
+    message_delete_text: str = None
 
     bad_words_text: str = None
     stop_word_text: str = None
@@ -28,6 +29,7 @@ class CreateGridSchema(BaseModel):
     stop_word: bool
     link: bool
     message_delete: bool
+    message_delete_text: str = None
     bad_words_text: str
     stop_word_text: str
     pinned: bool
@@ -43,6 +45,7 @@ class UpdateGridSchemaPartial(BaseModel):
     stop_word: bool = None
     link: bool = None
     message_delete: bool = None
+    message_delete_text: str = None
     bad_words_text: str = None
     stop_word_text: str = None
     pinned: bool = None
