@@ -8,6 +8,11 @@ from .schemas import *
 async def get_group(session: AsyncSession, group_id) -> Group | None:
     return await session.get(Group, group_id)
 
+async def get_group_max_id(session: AsyncSession, group_id) -> Group | None:
+    query = select(Group).where(Group.group_id == group_id)
+    result: Result = await session.execute(query)
+    return result.scalar_one_or_none()
+
 
 async def create_group(session: AsyncSession, group_in: CreateGroupSchema) -> Group:
     stmt = select(Group).where(Group.group_id == group_in.group_id)
