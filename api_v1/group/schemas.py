@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -10,7 +12,7 @@ class GroupSchema(BaseModel):
     stop_word: bool = None
     link: bool = None
     message_delete: bool = None
-    message_delete_text: str = None
+    message_delete_text: Optional[str] = None
     bad_words_text: str = None
     stop_word_text: str = None
 
@@ -27,7 +29,7 @@ class CreateGroupSchema(BaseModel):
     stop_word: bool
     link: bool
     message_delete: bool
-    message_delete_text: str = None
+    message_delete_text: Optional[str] = None
     bad_words_text: str
     stop_word_text: str
 
@@ -44,7 +46,7 @@ class UpdateGroupSchemaPartial(BaseModel):
     stop_word: bool = None
     link: bool = None
     message_delete: bool = None
-    message_delete_text: str = None
+    message_delete_text: Optional[str] = None
     bad_words_text: str = None
     stop_word_text: str = None
     pinned: bool = None
