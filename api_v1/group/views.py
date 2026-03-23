@@ -17,6 +17,16 @@ async def get_user_by_id(
         raise HTTPException(status_code=404)
 
     return result
+@router.get("/max/{group_id}/", response_model=schemas.GroupSchema)
+async def get_user_by_max_id(
+    group_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    result = await crud.get_group_max_id(session, group_id)
+    if not result:
+        raise HTTPException(status_code=404)
+
+    return result
 
 @router.post("/", response_model=schemas.GroupSchema)
 async def create_group(
