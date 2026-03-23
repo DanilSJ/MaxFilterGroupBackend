@@ -1,8 +1,8 @@
 """test
 
-Revision ID: e63166919ae0
+Revision ID: 88179e39cf1e
 Revises: 
-Create Date: 2026-03-22 23:26:30.357315
+Create Date: 2026-03-23 22:07:05.791840
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e63166919ae0'
+revision: str = '88179e39cf1e'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,7 +28,7 @@ def upgrade() -> None:
     sa.Column('stop_word', sa.Boolean(), nullable=False),
     sa.Column('link', sa.Boolean(), nullable=False),
     sa.Column('message_delete', sa.Boolean(), nullable=False),
-    sa.Column('message_delete_text', sa.String(), nullable=False),
+    sa.Column('message_delete_text', sa.String(), nullable=True),
     sa.Column('bad_words_text', sa.Text(), nullable=True),
     sa.Column('stop_word_text', sa.Text(), nullable=True),
     sa.Column('pinned', sa.Boolean(), nullable=False),
@@ -52,7 +52,7 @@ def upgrade() -> None:
     sa.Column('stop_word', sa.Boolean(), nullable=False),
     sa.Column('link', sa.Boolean(), nullable=False),
     sa.Column('message_delete', sa.Boolean(), nullable=False),
-    sa.Column('message_delete_text', sa.String(), nullable=False),
+    sa.Column('message_delete_text', sa.String(), nullable=True),
     sa.Column('bad_words_text', sa.Text(), nullable=True),
     sa.Column('stop_word_text', sa.Text(), nullable=True),
     sa.Column('pinned', sa.Boolean(), nullable=False),

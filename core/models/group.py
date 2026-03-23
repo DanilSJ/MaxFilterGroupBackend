@@ -13,7 +13,7 @@ class Group(Base):
     stop_word: Mapped[bool] = mapped_column(Boolean, default=False)
     link: Mapped[bool] = mapped_column(Boolean, default=False)
     message_delete: Mapped[bool] = mapped_column(Boolean, default=False)
-    message_delete_text: Mapped[str] = mapped_column(String, default=False)
+    message_delete_text: Mapped[str] = mapped_column(String, nullable=True)
 
     bad_words_text: Mapped[str] = mapped_column(Text, nullable=True)
     stop_word_text: Mapped[str] = mapped_column(Text, nullable=True)
