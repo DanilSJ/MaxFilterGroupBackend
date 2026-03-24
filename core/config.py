@@ -12,7 +12,7 @@ class AuthSettings(BaseSettings):
 
     PRIVATE_KEY: pathlib.Path = BASE_DIR / "certs" / "private_jwt.pem"
     PUBLIC_KEY: pathlib.Path = BASE_DIR / "certs" / "public_jwt.pem"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
 
 class Settings(BaseSettings):
