@@ -146,3 +146,15 @@ async def update_grid(
     await session.refresh(grid, attribute_names=['groups'])
 
     return grid
+
+
+async def delete_grid(session: AsyncSession, grid_id: int) -> bool:
+    stmt = select(Group).where(Grid.id == grid_id)
+    result: Result = await session.execute(stmt)
+    grid = result.scalar_one_or_none()
+
+    if grid:
+        await session.delete(grid)
+        await session.commit()
+        return True
+    return False
