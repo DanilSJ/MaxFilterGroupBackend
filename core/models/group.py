@@ -15,6 +15,11 @@ class Group(Base):
     message_delete: Mapped[bool] = mapped_column(Boolean, default=False)
     message_delete_text: Mapped[str] = mapped_column(String, nullable=True)
 
+    message_repost_text: Mapped[str] = mapped_column(String, nullable=True)
+    message_link_text: Mapped[str] = mapped_column(String, nullable=True)
+    message_bad_text: Mapped[str] = mapped_column(String, nullable=True)
+    message_stop_word_text: Mapped[str] = mapped_column(String, nullable=True)
+
     bad_words_text: Mapped[str] = mapped_column(Text, nullable=True)
     stop_word_text: Mapped[str] = mapped_column(Text, nullable=True)
 
