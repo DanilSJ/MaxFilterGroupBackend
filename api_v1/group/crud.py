@@ -48,3 +48,15 @@ async def update_group(
     await session.refresh(group)
 
     return group
+
+
+async def delete_group(session: AsyncSession, group_id: int) -> bool:
+    stmt = select(Group).where(Group.group_id == group_id)
+    result: Result = await session.execute(stmt)
+    group = result.scalar_one_or_none()
+
+    if group:
+        await session.delete(group)
+        await session.commit()
+        return True
+    return False
