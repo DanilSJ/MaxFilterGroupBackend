@@ -48,3 +48,14 @@ async def update_group(
         group_id=group_id,
         group_update=group_update
     )
+
+@router.delete("/{group_id}/")
+async def delete_group(
+        group_id: int,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+
+    return await crud.delete_group(
+        session=session,
+        group_id=group_id
+    )
