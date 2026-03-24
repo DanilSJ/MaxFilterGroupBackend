@@ -13,6 +13,12 @@ class GroupSchema(BaseModel):
     link: bool = None
     message_delete: bool = None
     message_delete_text: Optional[str] = None
+
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
+
     bad_words_text: str = None
     stop_word_text: str = None
 
@@ -33,6 +39,11 @@ class CreateGroupSchema(BaseModel):
     bad_words_text: str
     stop_word_text: str
 
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
+
     pinned: bool
 
     model_config = ConfigDict(from_attributes=True)
@@ -50,5 +61,10 @@ class UpdateGroupSchemaPartial(BaseModel):
     bad_words_text: str = None
     stop_word_text: str = None
     pinned: bool = None
+
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)

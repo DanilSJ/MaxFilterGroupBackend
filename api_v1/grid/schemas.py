@@ -19,6 +19,11 @@ class GridSchema(BaseModel):
     pinned: bool = None
     groups: List[GroupSchema] = None
 
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -35,6 +40,11 @@ class CreateGridSchema(BaseModel):
     pinned: bool
     group_ids: List[int] = None
 
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -50,5 +60,10 @@ class UpdateGridSchemaPartial(BaseModel):
     stop_word_text: str = None
     pinned: bool = None
     group_ids: List[int] = None
+
+    message_bad_text: Optional[str] = None
+    message_stop_word_text: Optional[str] = None
+    message_link_text: Optional[str] = None
+    message_repost_text: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
