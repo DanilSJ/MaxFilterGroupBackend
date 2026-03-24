@@ -33,16 +33,16 @@ async def get_grid_group(
     return await crud.get_grid_group(session=session, grid_id=grid_id)
 
 
-@router.patch("/{group_id}/", response_model=schemas.GridSchema)
+@router.patch("/{grid_id}/", response_model=schemas.GridSchema)
 async def update_grid(
-        group_id: int,
+        grid_id: int,
         group_update: schemas.UpdateGridSchemaPartial,
         session: AsyncSession = Depends(db_helper.session_dependency),
 ):
 
     return await crud.update_grid(
         session=session,
-        grid_id=group_id,
+        grid_id=grid_id,
         grid_update=group_update
     )
 
