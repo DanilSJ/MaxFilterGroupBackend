@@ -81,7 +81,9 @@ async def update_grid(
     sync_fields = {
         'bad_words', 'repost', 'stop_word', 'link',
         'message_delete', 'message_delete_text',
-        'bad_words_text', 'stop_word_text'
+        'bad_words_text', 'stop_word_text',
+        'message_bad_text', 'message_stop_word_text',
+        'message_link_text', 'message_repost_text'
     }
 
     # Сохраняем старые значения для отслеживания изменений
@@ -97,7 +99,7 @@ async def update_grid(
             fields_to_sync.append(field)
             old_values[field] = old_value
 
-    # Обновляем группы, если есть изменения в синхронизируемых полях
+    # Обновляем текущие группы, если есть изменения в синхронизируемых полях
     if fields_to_sync and grid.groups:
         for group in grid.groups:
             for field in fields_to_sync:
@@ -106,8 +108,9 @@ async def update_grid(
         # Добавляем группы в сессию для обновления
         session.add_all(grid.groups)
 
+    # Обрабатываем обновление списка групп
     if grid_update.group_ids is not None:
-        # Ищем группы по полю group_id (внешнему идентификатору), а не по id
+        # Ищем группы по полю group_id (внешнему идентификатору)
         stmt = select(Group).where(Group.group_id.in_(grid_update.group_ids))
         result = await session.execute(stmt)
         new_groups = result.scalars().all()
@@ -133,16 +136,21 @@ async def update_grid(
         for old_group in grid.groups:
             old_group.grid = None
 
-        # Привязываем новые группы
+        # Привязываем новые группы и синхронизируем с ними все поля из sync_fields
         for new_group in new_groups:
             new_group.grid = grid
 
-            # Синхронизируем поля с новыми группами
+            # Синхронизируем все поля из sync_fields с текущими значениями grid
             for field in sync_fields:
                 setattr(new_group, field, getattr(grid, field))
 
         session.add_all(new_groups)
         await session.flush()
+    else:
+        # Если group_ids не передан, но были изменения в синхронизируемых полях,
+        # и при этом есть привязанные группы, они уже обновлены выше
+        # Дополнительно ничего делать не нужно
+        pass
 
     await session.commit()
 
