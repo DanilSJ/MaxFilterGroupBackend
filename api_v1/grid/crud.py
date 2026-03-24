@@ -107,23 +107,26 @@ async def update_grid(
         session.add_all(grid.groups)
 
     if grid_update.group_ids is not None:
-        stmt = select(Group).where(Group.id.in_(grid_update.group_ids))
+        # Ищем группы по полю group_id (внешнему идентификатору), а не по id
+        stmt = select(Group).where(Group.group_id.in_(grid_update.group_ids))
         result = await session.execute(stmt)
         new_groups = result.scalars().all()
 
-        found_ids = {group.id for group in new_groups}
-        missing_ids = set(grid_update.group_ids) - found_ids
+        # Проверяем, что все запрошенные group_id найдены
+        found_group_ids = {group.group_id for group in new_groups}
+        missing_ids = set(grid_update.group_ids) - found_group_ids
         if missing_ids:
             raise HTTPException(
                 status_code=404,
-                detail=f"Groups not found with ids: {missing_ids}"
+                detail=f"Groups not found with group_ids: {missing_ids}"
             )
 
+        # Проверяем, что группы не привязаны к другим сеткам
         for group in new_groups:
             if group.grid_id is not None and group.grid_id != grid_id:
                 raise HTTPException(
                     status_code=409,
-                    detail=f"Group {group.id} is already assigned to another grid"
+                    detail=f"Group with group_id {group.group_id} is already assigned to another grid"
                 )
 
         # Отвязываем старые группы
@@ -146,7 +149,6 @@ async def update_grid(
     await session.refresh(grid, attribute_names=['groups'])
 
     return grid
-
 
 async def delete_grid(session: AsyncSession, grid_id: int) -> bool:
     stmt = select(Grid).where(Grid.id == grid_id)
