@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get("/{group_id}/", response_model=schemas.GroupSchema)
 async def get_user_by_id(
     group_id: int,
-    session: AsyncSession = Depends(db_helper.session_dependency),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     result = await crud.get_group(session, group_id)
     if not result:
@@ -20,7 +20,7 @@ async def get_user_by_id(
 @router.get("/max/{group_id}/", response_model=schemas.GroupSchema)
 async def get_user_by_max_id(
     group_id: int,
-    session: AsyncSession = Depends(db_helper.session_dependency),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     result = await crud.get_group_max_id(session, group_id)
     if not result:
@@ -31,7 +31,7 @@ async def get_user_by_max_id(
 @router.post("/", response_model=schemas.GroupSchema)
 async def create_group(
     group_in: schemas.CreateGroupSchema,
-    session: AsyncSession = Depends(db_helper.session_dependency),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     return await crud.create_group(session=session, group_in=group_in)
 
@@ -40,7 +40,7 @@ async def create_group(
 async def update_group(
         group_id: int,
         group_update: schemas.UpdateGroupSchemaPartial,
-        session: AsyncSession = Depends(db_helper.session_dependency),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
 
     return await crud.update_group(
@@ -52,7 +52,7 @@ async def update_group(
 @router.delete("/{group_id}/")
 async def delete_group(
         group_id: int,
-        session: AsyncSession = Depends(db_helper.session_dependency),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
 
     return await crud.delete_group(
