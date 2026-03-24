@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("s/", response_model=List[schemas.GridSchema])
 async def grids(
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.session_factory),
 ):
 
     return await crud.get_grids(session=session)
@@ -20,14 +20,14 @@ async def grids(
 @router.post("/", response_model=schemas.GridSchema)
 async def create_grid(
     grid_in: schemas.CreateGridSchema,
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.session_factory),
 ):
     return await crud.create_grid(session=session, grid_in=grid_in)
 
 @router.get("/{grid_id}/", response_model=schemas.GridSchema)
 async def get_grid_group(
     grid_id: int,
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.session_factory),
 ):
 
     return await crud.get_grid_group(session=session, grid_id=grid_id)
@@ -37,7 +37,7 @@ async def get_grid_group(
 async def update_grid(
         grid_id: int,
         group_update: schemas.UpdateGridSchemaPartial,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+        session: AsyncSession = Depends(db_helper.session_factory),
 ):
 
     return await crud.update_grid(
@@ -49,7 +49,7 @@ async def update_grid(
 @router.delete("/{grid_id}/")
 async def delete_grid(
         grid_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+        session: AsyncSession = Depends(db_helper.session_factory),
 ):
 
     return await crud.delete_grid(
