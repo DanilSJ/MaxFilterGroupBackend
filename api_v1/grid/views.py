@@ -45,3 +45,14 @@ async def update_grid(
         grid_id=group_id,
         grid_update=group_update
     )
+
+@router.delete("/{grid_id}/")
+async def delete_grid(
+        grid_id: int,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+
+    return await crud.delete_grid(
+        session=session,
+        grid_id=grid_id
+    )
