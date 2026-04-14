@@ -56,3 +56,16 @@ async def delete_grid(
         session=session,
         grid_id=grid_id
     )
+
+@router.post("/{grid_id}/copy/", response_model=schemas.GridSchema)
+async def copy_grid(
+    grid_id: int,
+    name: schemas.CopyGridSchema,  # только новое имя
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.copy_grid(
+        session=session,
+        grid_id=grid_id,
+        new_name=name.name
+    )
+
