@@ -1,12 +1,14 @@
 from fastapi import HTTPException
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from core.models import Group
 from .schemas import *
 
-async def get_group(session: AsyncSession, group_id) -> Group | None:
-    return await session.get(Group, group_id)
+async def get_group(session: AsyncSession, group_id: int) -> Group | None:
+    stmt = select(Group).where(func.abs(Group.group_id) == abs(group_id))
+    result: Result = await session.execute(stmt)
+    return result.scalars().first()
 
 async def get_group_max_id(session: AsyncSession, group_id) -> Group | None:
     query = select(Group).where(Group.group_id == group_id)

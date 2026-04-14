@@ -8,7 +8,7 @@ from api_v1.auth.views import get_token, get_current_user
 router = APIRouter()
 
 @router.get("/{group_id}/", response_model=schemas.GroupSchema)
-async def get_user_by_id(
+async def get_group_by_id(
     group_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
@@ -17,8 +17,10 @@ async def get_user_by_id(
         raise HTTPException(status_code=404)
 
     return result
+
+
 @router.get("/max/{group_id}/", response_model=schemas.GroupSchema)
-async def get_user_by_max_id(
+async def get_group_by_max_id(
     group_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
