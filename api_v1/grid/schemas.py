@@ -67,3 +67,8 @@ class UpdateGridSchemaPartial(BaseModel):
     message_repost_text: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class CopyGridSchema(BaseModel):
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
