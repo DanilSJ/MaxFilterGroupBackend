@@ -168,3 +168,36 @@ async def delete_grid(session: AsyncSession, grid_id: int) -> bool:
         await session.commit()
         return True
     return False
+
+async def copy_grid(
+    session: AsyncSession,
+    grid_id: int,
+    new_name: str,
+) -> Grid:
+
+    stmt = select(Grid).where(Grid.name == new_name)
+    result = await session.execute(stmt)
+    if result.scalars().first():
+        raise HTTPException(status_code=409, detail="Grid with this name already exists")
+
+    stmt = select(Grid).where(Grid.id == grid_id)
+    result = await session.execute(stmt)
+    original = result.scalars().first()
+
+    if not original:
+        raise HTTPException(status_code=404, detail="Grid not found")
+
+    grid_data = {
+        column.name: getattr(original, column.name)
+        for column in Grid.__table__.columns
+        if column.name not in ("id", "name")
+    }
+
+    new_grid = Grid(**grid_data, name=new_name)
+    session.add(new_grid)
+
+    await session.commit()
+
+    await session.refresh(new_grid, attribute_names=["groups"])
+
+    return new_grid
