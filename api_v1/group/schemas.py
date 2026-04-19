@@ -24,6 +24,8 @@ class GroupSchema(BaseModel):
 
     pinned: bool = None
 
+    position: Optional[int] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
