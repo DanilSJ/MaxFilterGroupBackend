@@ -61,3 +61,22 @@ async def delete_group(session: AsyncSession, group_id: int) -> bool:
         await session.commit()
         return True
     return False
+
+async def change_group_position(
+    session: AsyncSession,
+    group_id: int,
+    new_position: int,
+) -> Group:
+    stmt = select(Group).where(Group.id == group_id)
+    result: Result = await session.execute(stmt)
+    group = result.scalar_one_or_none()
+
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    group.position = new_position
+
+    await session.commit()
+    await session.refresh(group)
+
+    return group
