@@ -27,5 +27,6 @@ class Grid(Base):
     groups: Mapped[list["Group"]] = relationship(
         "Group",
         back_populates="grid",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        order_by="Group.position"
     )
