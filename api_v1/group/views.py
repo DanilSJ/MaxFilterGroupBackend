@@ -61,3 +61,15 @@ async def delete_group(
         session=session,
         group_id=group_id
     )
+
+@router.patch("/{group_id}/position/", response_model=schemas.GroupSchema)
+async def change_group_position(
+    group_id: int,
+    new_position: int,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.change_group_position(
+        session=session,
+        group_id=group_id,
+        new_position=new_position
+    )
