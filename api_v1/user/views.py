@@ -24,6 +24,13 @@ async def create_user(
 ):
     return await crud.create_user(session=session, user_in=user_in)
 
+@router.post("/max/", response_model=schemas.UserSchema)
+async def create_user_max(
+    user_in: schemas.RegisterMaxSchema,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    return await crud.create_user_max(session=session, user_in=user_in)
+
 
 @router.post("/login/")
 async def login_user(
