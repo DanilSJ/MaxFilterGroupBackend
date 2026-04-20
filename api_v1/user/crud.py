@@ -29,6 +29,19 @@ async def create_user(session: AsyncSession, user_in: RegisterSchema) -> User:
     return user
 
 
+async def create_user_max(session: AsyncSession, user_in: RegisterMaxSchema) -> User:
+    stmt = select(User).where(User.max_id == user_in.max_id)
+    result: Result = await session.execute(stmt)
+
+    if result.scalars().first():
+        raise HTTPException(status_code=409, detail="User already exists")
+
+    user = User(**user_in.model_dump())
+    session.add(user)
+    await session.commit()
+    return user
+
+
 async def login_user(session: AsyncSession, email: str, password: str) -> User:
     stmt = select(User).where(User.email == email)
     result: Result = await session.execute(stmt)
