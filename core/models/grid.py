@@ -1,5 +1,7 @@
 from sqlalchemy import String, Boolean, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from .associations_grid_user import grid_block_users
 from .base import Base
 
 
@@ -29,4 +31,10 @@ class Grid(Base):
         back_populates="grid",
         cascade="all, delete-orphan",
         order_by="Group.position"
+    )
+
+    block_users: Mapped[list["User"]] = relationship(
+        "User",
+        secondary=grid_block_users,
+        back_populates="blocked_in_grids"
     )
