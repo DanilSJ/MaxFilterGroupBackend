@@ -4,18 +4,32 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from core.models import Grid, Group
+from core.models import Grid, Group, User
 from .schemas import *
 
 
 async def get_grids(session: AsyncSession) -> List[Grid]:
-    stmt = select(Grid).order_by(Grid.id).options(selectinload(Grid.groups))
+    stmt = (
+        select(Grid)
+        .order_by(Grid.id)
+        .options(
+            selectinload(Grid.groups).selectinload(Group.grid),
+            selectinload(Grid.block_users)
+        )
+    )
     result = await session.execute(stmt)
     grids = result.scalars().all()
     return list(grids)
 
 async def get_grid_group(session: AsyncSession, grid_id: int) -> Grid:
-    stmt = select(Grid).where(Grid.id == grid_id).order_by(Grid.id).options(selectinload(Grid.groups))
+    stmt = (
+        select(Grid)
+        .where(Grid.id == grid_id)
+        .order_by(Grid.id)
+        .options(
+            selectinload(Grid.groups).selectinload(Group.grid),
+            selectinload(Grid.block_users)
+        ))
     result = await session.execute(stmt)
     grids = result.scalars().first()
     return grids
@@ -201,3 +215,45 @@ async def copy_grid(
     await session.refresh(new_grid, attribute_names=["groups"])
 
     return new_grid
+
+
+async def block_user_in_grid(
+    session: AsyncSession,
+    grid_id: int,
+    max_id: int,
+) -> Grid:
+    stmt = (
+        select(Grid)
+        .where(Grid.id == grid_id)
+        .options(
+            selectinload(Grid.block_users),
+            selectinload(Grid.groups),  # 👈 ЭТО ИСПРАВЛЯЕТ ТВОЮ ОШИБКУ
+        )
+    )
+
+    result = await session.execute(stmt)
+    grid = result.scalars().first()
+
+    if not grid:
+        raise HTTPException(status_code=404, detail="Grid not found")
+
+    stmt = select(User).where(User.max_id == max_id)
+    result = await session.execute(stmt)
+    user = result.scalars().first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user in grid.block_users:
+        raise HTTPException(status_code=409, detail="User already blocked")
+
+    grid.block_users.append(user)
+
+    await session.commit()
+
+    await session.refresh(
+        grid,
+        attribute_names=["block_users", "groups"]
+    )
+
+    return grid
