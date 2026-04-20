@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper
 from . import schemas
 from . import crud
-from api_v1.auth.views import get_token, get_current_user
+
 
 router = APIRouter()
 
@@ -69,3 +69,14 @@ async def copy_grid(
         new_name=name.name
     )
 
+@router.post("/{grid_id}/block-user/", response_model=schemas.GridSchema)
+async def block_user(
+    grid_id: int,
+    data: schemas.BlockUserSchema,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.block_user_in_grid(
+        session=session,
+        grid_id=grid_id,
+        max_id=data.max_id,
+    )
