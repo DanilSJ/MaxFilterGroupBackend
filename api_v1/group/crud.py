@@ -2,17 +2,36 @@ from fastapi import HTTPException
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from core.models import Group
+from sqlalchemy.orm import selectinload
+
+from core.models import Group, Grid
 from .schemas import *
 
-async def get_group(session: AsyncSession, group_id) -> Group | None:
-    return await session.get(Group, group_id)
+async def get_group(session: AsyncSession, group_id: int) -> Group | None:
+    stmt = (
+        select(Group)
+        .where(Group.id == group_id)
+        .options(selectinload(Group.grid)
+        .selectinload(Grid.block_users) )
+    )
 
+    result = await session.execute(stmt)
+    return result.scalars().first()
 
-async def get_group_max_id(session: AsyncSession, group_id) -> Group | None:
-    query = select(Group).where(func.abs(Group.group_id) == abs(group_id))
-    result: Result = await session.execute(query)
-    return result.scalar_one_or_none()
+async def get_group_max_id(
+    session: AsyncSession,
+    group_id: int
+) -> Group | None:
+
+    query = (
+        select(Group)
+        .where(func.abs(Group.group_id) == abs(group_id))
+        .options(selectinload(Group.grid)
+        .selectinload(Grid.block_users))
+    )
+
+    result = await session.execute(query)
+    return result.scalars().first()
 
 
 async def create_group(session: AsyncSession, group_in: CreateGroupSchema) -> Group:
