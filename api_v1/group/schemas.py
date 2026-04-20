@@ -1,7 +1,14 @@
-from typing import Optional
-
+from typing import Optional, List
 from pydantic import BaseModel, ConfigDict
 
+from api_v1.user.schemas import UserSchema
+
+
+class GridMiniSchema(BaseModel):
+    id: int
+    name: str
+    block_users: List[UserSchema] = None
+    model_config = ConfigDict(from_attributes=True)
 
 class GroupSchema(BaseModel):
     id: int
@@ -25,6 +32,8 @@ class GroupSchema(BaseModel):
     pinned: bool = None
 
     position: Optional[int] = None
+
+    grid: Optional[GridMiniSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
 
