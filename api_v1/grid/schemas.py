@@ -72,3 +72,8 @@ class CopyGridSchema(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class BlockUserSchema(BaseModel):
+    max_id: int
+
+    model_config = ConfigDict(from_attributes=True)
