@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from api_v1.group.schemas import GroupSchema
+from api_v1.user.schemas import UserSchema
 
 
 class GridSchema(BaseModel):
@@ -15,6 +16,8 @@ class GridSchema(BaseModel):
 
     bad_words_text: str = None
     stop_word_text: str = None
+
+    block_users: List[UserSchema] = None
 
     pinned: bool = None
     groups: List[GroupSchema] = None

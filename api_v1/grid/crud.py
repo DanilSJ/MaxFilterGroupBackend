@@ -168,9 +168,20 @@ async def update_grid(
 
     await session.commit()
 
-    await session.refresh(grid, attribute_names=['groups'])
+    stmt = (
+        select(Grid)
+        .where(Grid.id == grid_id)
+        .options(
+            selectinload(Grid.block_users),
+            selectinload(Grid.groups).selectinload(Group.grid).selectinload(Grid.block_users)
+        )
+    )
+
+    result = await session.execute(stmt)
+    grid = result.scalars().first()
 
     return grid
+
 
 async def delete_grid(session: AsyncSession, grid_id: int) -> bool:
     stmt = select(Grid).where(Grid.id == grid_id)
