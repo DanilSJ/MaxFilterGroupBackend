@@ -223,9 +223,21 @@ async def copy_grid(
 
     await session.commit()
 
-    await session.refresh(new_grid, attribute_names=["groups"])
+    stmt = (
+        select(Grid)
+        .where(Grid.id == new_grid.id)
+        .options(
+            selectinload(Grid.block_users),
+            selectinload(Grid.groups).selectinload(Group.grid).selectinload(Grid.block_users)
+        )
+    )
 
-    return new_grid
+    result = await session.execute(stmt)
+    grid = result.scalars().first()
+
+    return grid
+
+
 
 
 async def block_user_in_grid(
